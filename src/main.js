@@ -1,5 +1,7 @@
 import * as core from '@actions/core'
-import { wait } from './wait.js'
+import path from 'node:path'
+import fs from 'node:fs'
+import { Blob } from 'node:buffer'
 
 /**
  * The main function for the action.
@@ -8,18 +10,45 @@ import { wait } from './wait.js'
  */
 export async function run() {
   try {
-    const ms = core.getInput('milliseconds')
+    const pathname = core.getInput('path')
+    const baseUrl = core.getInput('base-url')
+    const categoryStub = core.getInput('category-stub')
+    const documentStub = core.getInput('document-stub')
+    const revisedAt = core.getInput('revised-at')
 
     // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    core.debug(`Waiting ${ms} milliseconds ...`)
+    core.debug(`Revised at: ${revisedAt} (${typeof revisedAt})`)
 
-    // Log the current timestamp, wait, then log the new timestamp
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    // Compile form data
+    const formData = new FormData()
+
+    const buffer = fs.readFileSync(pathname)
+    const blob = new Blob([buffer])
+    const filename = path.basename(pathname)
+    formData.append('file', blob, filename)
+
+    if (revisedAt) {
+      formData.set('revised-at', revisedAt)
+    }
+
+    // Send POST request
+    const url = new URL(baseUrl, categoryStub, documentStub)
+    const response = await fetch(url, {
+      method: 'POST',
+      body: formData
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to upload revision: ${response}`)
+    }
+
+    const location = response.headers.get('location')
+    if (!location) {
+      throw new Error('Did not receive location in response headers')
+    }
 
     // Set outputs for other workflow steps to use
-    core.setOutput('time', new Date().toTimeString())
+    core.setOutput('location', location)
   } catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error) core.setFailed(error.message)
