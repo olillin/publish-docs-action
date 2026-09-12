@@ -28564,8 +28564,8 @@ async function run() {
   try {
     const pathname = getInput('path');
     const baseUrl = getInput('base_url') || 'https://newdocs.olillin.com';
-    const categoryStub = getInput('category_stub');
-    const documentStub = getInput('document_stub');
+    const categorySlug = getInput('category_slug');
+    const documentSlug = getInput('document_slug');
     const revisedAt = getInput('revised_at');
     const ignoreConflicts = parseBoolean(getInput('ignore_conflicts'));
 
@@ -28587,9 +28587,9 @@ async function run() {
 
     // Send POST request
     debug(
-      `Creating URL at '${baseUrl}' with category '${categoryStub}' and document '${documentStub}`
+      `Creating URL at '${baseUrl}' with category '${categorySlug}' and document '${documentSlug}`
     );
-    const url = new URL(categoryStub + '/' + documentStub, baseUrl);
+    const url = new URL(categorySlug + '/' + documentSlug, baseUrl);
     const response = await fetch(url, {
       method: 'POST',
       body: formData
