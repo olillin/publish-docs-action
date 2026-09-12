@@ -49,12 +49,7 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      docs:
-        image: ghcr.io/olillin/new-docs:latest
-        env:
-          DATABASE_URL: postgres://postgres:postgres@db:5432/docs
-          SEED: 1
-      db:
+      postgres:
         image: postgres:18
         env:
           POSTGRES_DB: docs
@@ -62,8 +57,35 @@ jobs:
         options: >-
           --health-cmd pg_isready --health-interval 10s --health-timeout 5s
           --health-retries 5
+        ports:
+          - '5432:5432'
 
     steps:
+      - name: Wait for PostgreSQL
+        timeout-minutes: 1
+        run: |
+          until docker exec ${{ job.services.postgres.id }} pg_isready; do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
+
+      - name: Start Docs in Container
+        run: |
+          docker run -d \
+            --network host \
+            -p "3000:3000" \
+            -e DATABASE_URL="postgres://postgres:postgres@localhost:5432/docs" \
+            -e SEED=1 \
+            ghcr.io/olillin/new-docs:latest
+
+      - name: Wait for Docs
+        timeout-minutes: 1
+        run: |
+          until curl -f "http://localhost:3000"; do
+            echo "Waiting for Docs..."
+            sleep 2
+          done
+
       - name: Checkout
         id: checkout
         uses: actions/checkout@v7
@@ -75,7 +97,7 @@ jobs:
           path: ./resources/document.pdf
           category_slug: operational-documents
           document_slug: bylaws
-          base_url: http://docs
+          base_url: http://localhost:3000
 
       - name: Print Output
         id: output
