@@ -1,23 +1,24 @@
-name: The name of your action here
-description: Provide a description here
-author: Your name or organization here
+name: Publish Docs Action
+description: Upload new revisions of division documents
+author: olillin
 
-# Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
-  icon: heart
-  color: red
+  icon: 'file-plus'
+  color: blue
 
-# Define your inputs here.
 inputs:
-  milliseconds:
-    description: Your input description here
+  category-stub:
+    description: Stub of the category where the document resides
     required: true
-    default: '1000'
+  document-stub:
+    description: Stub of the document to update
+    required: true
+  revised-at:
+    description: Date when the document was revised
 
-# Define your outputs here.
 outputs:
-  time:
-    description: Your output description here
+  location:
+    description: URL which points to the published revision
 
 runs:
   using: node24

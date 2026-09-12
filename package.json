@@ -1,17 +1,17 @@
 {
-  "name": "javascript-action",
-  "description": "GitHub Actions JavaScript Template",
+  "name": "publish-docs-action",
+  "description": "Upload new revisions of division documents",
   "version": "0.0.0",
-  "author": "",
+  "author": "olillin",
   "type": "module",
   "private": true,
-  "homepage": "https://github.com/actions/javascript-action#readme",
+  "homepage": "https://github.com/olillin/publish-docs-action#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/javascript-action.git"
+    "url": "git+https://github.com/olillin/publish-docs-action.git"
   },
   "bugs": {
-    "url": "https://github.com/actions/javascript-action/issues"
+    "url": "https://github.com/olillin/publish-docs-action/issues"
   },
   "keywords": [
     "actions"
@@ -42,6 +42,8 @@
   "devDependencies": {
     "@eslint/compat": "^2.1.1",
     "@eslint/config-array": "^0.23.5",
+    "@eslint/eslintrc": "^3.3.7",
+    "@eslint/js": "^10.0.1",
     "@eslint/object-schema": "^3.0.5",
     "@github/local-action": "^7.0.1",
     "@jest/globals": "^30.5.1",
