@@ -10,17 +10,17 @@ inputs:
   path:
     description: Path to the file to upload.
     required: true
-  base-url:
+  base_url:
     description: The docs server to publish documents to.
     required: true
     default: https://newdocs.olillin.com
-  category-stub:
+  category_stub:
     description: Stub of the category where the document resides
     required: true
-  document-stub:
+  document_stub:
     description: Stub of the document to update
     required: true
-  revised-at:
+  revised_at:
     description: Date when the document was revised
 
 outputs:

@@ -11,10 +11,10 @@ import { Blob } from 'node:buffer'
 export async function run() {
   try {
     const pathname = core.getInput('path')
-    const baseUrl = core.getInput('base-url')
-    const categoryStub = core.getInput('category-stub')
-    const documentStub = core.getInput('document-stub')
-    const revisedAt = core.getInput('revised-at')
+    const baseUrl = core.getInput('base_url')
+    const categoryStub = core.getInput('category_stub')
+    const documentStub = core.getInput('document_stub')
+    const revisedAt = core.getInput('revised_at')
 
     // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
     core.debug(`Revised at: ${revisedAt} (${typeof revisedAt})`)
