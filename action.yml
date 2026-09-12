@@ -8,20 +8,22 @@ branding:
 
 inputs:
   path:
-    description: Path to the file to upload.
+    description: Path to the file to upload
     required: true
   base_url:
-    description: The docs server to publish documents to.
+    description: The docs server to publish documents to
+    required: false
+    default: 'https://newdocs.olillin.com'
+  category_slug:
+    description: Slug of the category where the document resides
     required: true
-    default: https://newdocs.olillin.com
-  category_stub:
-    description: Stub of the category where the document resides
-    required: true
-  document_stub:
-    description: Stub of the document to update
+  document_slug:
+    description: Slug of the document to update
     required: true
   revised_at:
     description: Date when the document was revised
+  ignore_conflicts:
+    description: Ignore conflicts with existing revisions
 
 outputs:
   location:

@@ -28550,6 +28550,11 @@ function error(message, properties = {}) {
     issueCommand('error', toCommandProperties(properties), message instanceof Error ? message.toString() : message);
 }
 
+function parseBoolean(s) {
+  const truthyValues = ['true', 't', 'yes', 'y', '1', 'enable', 'enabled'];
+  return truthyValues.includes(s.trim().toLowerCase())
+}
+
 /**
  * The main function for the action.
  *
@@ -28558,13 +28563,13 @@ function error(message, properties = {}) {
 async function run() {
   try {
     const pathname = getInput('path');
-    const baseUrl = getInput('base_url');
+    const baseUrl = getInput('base_url') || 'https://newdocs.olillin.com';
     const categoryStub = getInput('category_stub');
     const documentStub = getInput('document_stub');
     const revisedAt = getInput('revised_at');
+    const ignoreConflicts = parseBoolean(getInput('ignore_conflicts'));
 
     // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    debug(`Revised at: ${revisedAt} (${typeof revisedAt})`);
 
     // Compile form data
     const formData = new FormData();
@@ -28573,19 +28578,31 @@ async function run() {
     const blob = new Blob$1([buffer]);
     const filename = path.basename(pathname);
     formData.append('file', blob, filename);
+    debug(`Added file from ${pathname}`);
 
     if (revisedAt) {
       formData.set('revised-at', revisedAt);
+      debug(`Set revised at: ${revisedAt}`);
     }
 
     // Send POST request
-    const url = new URL(baseUrl, categoryStub, documentStub);
+    debug(
+      `Creating URL at '${baseUrl}' with category '${categoryStub}' and document '${documentStub}`
+    );
+    const url = new URL(categoryStub + '/' + documentStub, baseUrl);
     const response = await fetch(url, {
       method: 'POST',
       body: formData
     });
 
     if (!response.ok) {
+      if (response.status === 409 && ignoreConflicts) {
+        debug(
+          'Failed to upload revision because of conflict, ignoring because ignore_conflicts is enabled'
+        );
+        return
+      }
+
       throw new Error(`Failed to upload revision: ${response}`)
     }
 

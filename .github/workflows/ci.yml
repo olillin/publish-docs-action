@@ -19,11 +19,11 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
         id: setup-node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: .node-version
           cache: npm
@@ -48,17 +48,35 @@ jobs:
     name: GitHub Actions Test
     runs-on: ubuntu-latest
 
+    services:
+      docs:
+        image: ghcr.io/olillin/new-docs:latest
+        env:
+          DATABASE_URL: postgres://postgres:postgres@db:5432/docs
+          SEED: 1
+      db:
+        image: postgres:18
+        env:
+          POSTGRES_DB: docs
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Test Local Action
         id: test-action
         uses: ./
         with:
-          milliseconds: 2000
+          path: ./resources/document.pdf
+          category_slug: operational-documents
+          document_slug: bylaws
+          base_url: http://docs
 
       - name: Print Output
         id: output
-        run: echo "${{ steps.test-action.outputs.time }}"
+        run: echo "${{ steps.test-action.outputs.location }}"
